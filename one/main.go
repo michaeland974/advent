@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
+	"strconv"
 )
 
 func parseFile(path string) ([]string, error) { // Note the changed signature
@@ -32,6 +34,37 @@ func parseFile(path string) ([]string, error) { // Note the changed signature
 	return words, nil 
 }
 
+type Rotation struct {
+	Direction string
+	Value     int
+}
+
+func parseRotation(s string) Rotation {
+	c := string(s[0])
+	numStr := s[1:]
+
+	val, _ := strconv.Atoi(numStr)
+
+	if c == "L" {
+		val = -val
+	}
+
+	return Rotation {
+		Direction: c,
+		Value: val,
+	}
+}
+
+func aggregateCyclic(current int, change int) (int, int) {
+	rawSum := current + change	
+	modResult := rawSum % 100
+	result := (modResult + 100) % 100
+	cycleAmount := rawSum - result
+	cycles := cycleAmount / 100
+
+	return result, int(math.Abs(float64(cycles)))
+}
+
 func main() {
 	fileData, err := parseFile("one/input.txt")
 
@@ -40,6 +73,24 @@ func main() {
 		return
 	}
 
-	// 7. Print the resulting slice
-	fmt.Println("Total words:", len(fileData))
+	rotations := []Rotation{}
+	
+	// Parse rotations
+	for _, word := range fileData {
+		rotations = append(rotations, parseRotation(word))
+	}
+	
+  currentPosition := 50
+	diff := 0
+	count := 0
+
+	for _, rot := range rotations {
+		currentPosition, diff =  aggregateCyclic(currentPosition, rot.Value)
+		if currentPosition == 0 {
+			count++
+		}
+		count += diff
+	}
+
+	fmt.Print(count)
 }
