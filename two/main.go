@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func parseFile(path string) (string, error) {
@@ -24,10 +25,8 @@ func applyToRange(start, end int, operation EvalFunc) int {
 		if operation(i) {
 			count++
 		}
-		return count
 	}	
-
-	return 0
+	return count
 }
 
 func isTwice(num int) bool {
@@ -37,8 +36,6 @@ func isTwice(num int) bool {
 		middleIndex := l / 2
 		firstPart := s[:middleIndex]
 		secondPart := s [middleIndex:]
-		fmt.Println(firstPart)
-		fmt.Println(secondPart)
 		if firstPart == secondPart {
 			return true
 		}
@@ -47,15 +44,32 @@ func isTwice(num int) bool {
 }
 
 func main() {
-	// c, err := parseFile("two/input.txt")
+	c, err := parseFile("two/input.txt")
 
-	// if err != nil {
-	// 	fmt.Printf("Error fromm parseFile() %v\n", err)
-	// }
+	if err != nil {
+		fmt.Printf("Error fromm parseFile() %v\n", err)
+	}
 
-	//nums := strings.Split(c, ",")
+	// count := 0
+	limits := strings.Split(c, ",")
+	finalCount := 0
 
-	// isTwice(88128812)
-	// isTwice(112112)
-	isTwice(54354)
+	for _, limit := range limits {
+		fmt.Printf("limit is %s\n", limit)
+	
+		parts := strings.Split(limit, "-")
+		start, _ := strconv.Atoi(parts[0])
+		end, _ := strconv.Atoi(parts[1])
+		result := applyToRange(start, end, isTwice)
+		finalCount += result
+	}
+
+	// testing := "11-22"
+
+	// parts := strings.Split(testing, "-")
+	// start, _ := strconv.Atoi(parts[0])
+	// end, _ := strconv.Atoi(parts[1])
+
+	// result := applyToRange(start, end, isTwice)
+	fmt.Printf("Result is %d", finalCount)
 }
